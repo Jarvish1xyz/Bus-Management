@@ -3,7 +3,7 @@ const { getAllDriver, getDriverById, addDriver } = require('../controllers/drive
 const { authMiddleware, adminMiddleware } = require('../middleware/auth.middleware');
 const driverRouter = express.Router();
 
-driverRouter.get('/all', authMiddleware, adminMiddleware, getAllDriver);
+driverRouter.post('/all', authMiddleware, adminMiddleware, getAllDriver);
 driverRouter.get('/:id', authMiddleware, getDriverById);
 driverRouter.post('/', authMiddleware, adminMiddleware, addDriver);
 

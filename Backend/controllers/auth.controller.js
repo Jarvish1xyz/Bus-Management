@@ -7,6 +7,7 @@ const Student = require("../models/Student");
 exports.adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log("Admin login attempt:", email, password);
 
         if (!email || !password) {
             return res.status(400).json({ msg: "All fields required" });

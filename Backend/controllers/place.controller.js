@@ -3,7 +3,7 @@ const University = require('../models/University');
 
 exports.getAllPlace = async (req, res) => {
     try {
-        const place = await Place.find().populate('university');
+        const place = await Place.find({university: req.body.university}).populate('university');
         res.status(200).json(place);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -27,7 +27,7 @@ exports.addPlace = async (req, res) => {
 
         for (const place of names) {
             const path = await Place.create({
-                place,
+                name:place,
                 university: uni._id,
             });
         }
@@ -35,6 +35,15 @@ exports.addPlace = async (req, res) => {
         res.status(200).json({
             msg: "Place registered successfully",
         });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+exports.deletePlace = async (req, res) => {
+    try {
+        const place = await Place.findByIdAndDelete(req.params.id);
+        res.status(200).json({ msg: "Place deleted successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

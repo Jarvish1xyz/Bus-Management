@@ -1,65 +1,97 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Navbar from './component/Navbar';
-import LandingPage from './pages/LandingPage';
-import RegisterPage from './pages/RegisterPage';
-import LoginPage from './pages/LoginPage';
-import AddPlace from "./pages/AddPlace";
-import AddDriver from "./pages/AddDriver";
-import AddBus from "./pages/AddBus";
-import AddStudent from "./pages/AddStudent";
-import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./component/ProtectedRoute";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NoticeProvider } from "./NoticeContext";
+
+import Layout from "./components/pages/Layout";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import RegistrationPage from "./pages/RegistrationPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import PlaceManagement from "./pages/admin/PlaceManagement";
+import BusManagement from "./pages/admin/BusManagement";
+import Loading from "./components/pages/Loading";
 
 function App() {
+  const [authLoading, setAuthLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null");
+    } catch {
+      return null;
+    }
+  });
+
+  const [isLogin, setIsLogin] = useState(() => !!localStorage.getItem("token"));
+
+  console.log("APP STATE:", { isLogin, user });
+
+  // ✅ Load user only when login state changes
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+
+    setIsLogin(!!token);
+    setUser(storedUser);
+    setAuthLoading(false); // ✅ important
+  }, []);
+
+  const handleAuthChange = () => {
+    const token = localStorage.getItem("token");
+    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+
+    setIsLogin(!!token);
+    setUser(storedUser);
+    console.log("ROUTE CHECK", { isLogin, user });
+  };
+
+  if (authLoading) {
+    return <Loading />;
+  }
+
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-[#020617] text-white selection:bg-blue-500/30">
-        {/* Deep background glass effect layers */}
-        <div className="fixed inset-0 overflow-hidden -z-10">
-          <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[100px]" />
-        </div>
-
-        {/* <Navbar /> */}
-
+    <NoticeProvider>
+      <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
 
-          <Route path="/dashboard" element={
-            <ProtectedRoute role="admin">
-              <Dashboard />
-            </ProtectedRoute>
-          } />
+          {!isLogin ? (
+            <>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage onLoginSuccess={handleAuthChange} />} />
+              <Route path="/register" element={<RegistrationPage />} />
+            </>
+          ) : (
 
-          <Route path="/add-place" element={
-            <ProtectedRoute role="admin">
-              <AddPlace />
-            </ProtectedRoute>
-          } />
+            <Route path="/" element={<Layout onLogout={handleAuthChange} />}>
 
-          <Route path="/add-driver" element={
-            <ProtectedRoute role="admin">
-              <AddDriver />
-            </ProtectedRoute>
-          } />
+              <Route index element={
+                user?.role === "admin" ? (
+                  <AdminDashboard />
+                ) : user?.role === "driver" ? (
+                  <div>Driver Dashboard</div>
+                ) : user?.role === "student" ? (
+                  <div>Student Dashboard</div>
+                ) : (
+                  <Navigate to="/login" />  // ❗ instead of <Loading />
+                )
+              }
+              />
 
-          <Route path="/add-bus" element={
-            <ProtectedRoute role="admin">
-              <AddBus />
-            </ProtectedRoute>
-          } />
+              {user?.role === "admin" && (
+                <>
+                  <Route path="/places" element={<PlaceManagement />} />
+                  <Route path="/buses" element={<BusManagement />} />
+                </>
+              )}
+            </Route>
+          )}
+          {/* PUBLIC */}
 
-          <Route path="/add-student" element={
-            <ProtectedRoute role="admin">
-              <AddStudent />
-            </ProtectedRoute>
-          } />
+          {/* PROTECTED */}
+
+          {/* <Route path="*" element={<Navigate to="/" />} /> */}
         </Routes>
-      </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </NoticeProvider>
   );
 }
 

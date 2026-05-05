@@ -1,0 +1,369 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import API from "../../../api";
+
+function CreateMOM() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  const navigate = useNavigate();
+  const [allUsers, setAllUsers] = useState([]); // To store user list from DB
+  const [activeDropdown, setActiveDropdown] = useState(null); // Track which input is open
+  const [participants, setParticipants] = useState([""]);
+  const [isAllDept, setIsAllDept] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    id: '',
+    date: '',
+    time: '',
+    agenda: '',
+    note: '',
+  });
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await API.get("/user/all", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        setAllUsers(res.data);
+        // console.log(res.data);
+      } catch (err) {
+        console.error("Failed to fetch users", err);
+      }
+    };
+    fetchUsers();
+
+    // Existing draft logic...
+    const draft = localStorage.getItem("meetingDraft");
+    if (draft) {
+      const parsed = JSON.parse(draft);
+      setFormData(parsed);
+      const participantsDraft = localStorage.getItem("participantsDraft");
+      if (participantsDraft) {
+        setParticipants(JSON.parse(participantsDraft));
+      }
+      localStorage.removeItem("meetingDraft");
+      localStorage.removeItem("participantsDraft");
+      localStorage.setItem("isGoogle", "true");
+    }
+  }, []);
+
+  const removeParticipant = (index) => {
+    const updated = participants.filter((_, i) => i !== index);
+    setParticipants(updated.length ? updated : [""]); // Keep at least one empty row
+  };
+
+  const handelChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const updateParticipant = (index, value) => {
+    const updated = [...participants];
+    updated[index] = value;
+    setParticipants(updated);
+  };
+
+  const addParticipant = () => setParticipants([...participants, ""]);
+
+  // Function to handle Google API Redirect
+  const scheduleGoogleMeet = () => {
+
+    localStorage.setItem(
+      "meetingDraft",
+      JSON.stringify(formData)
+    );
+    localStorage.setItem(
+      "participantsDraft",
+      JSON.stringify(participants)
+    );
+    const token = localStorage.getItem("token");
+    const backendBaseUrl = process.env.REACT_APP_API_URL;
+
+    // Dynamically point to your Render backend
+    window.location.href = `${backendBaseUrl}/auth/google?token=${token}`;
+  };
+
+  const updateUserLinks = async (meetingId, allMembers) => {
+    try {
+      const promises = allMembers.map(memberEmail =>
+        API.patch(`/user/meeting/update/`, {
+          email: memberEmail,
+          meetingid: meetingId
+        }, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        })
+      );
+      await Promise.all(promises);
+    } catch (err) {
+      console.error("Error linking users:", err.message);
+    }
+  };
+
+  const save = async (e) => {
+    if (e) e.preventDefault();
+    try {
+      if (user.role !== "HR" && user.role !== "Admin") {
+        alert("Only HR/Admin can create meetings");
+        return navigate('/');
+      }
+
+      const cleanParticipants = participants.filter(p => p.trim() !== "");
+      const allMembers = Array.from(new Set([...cleanParticipants, user.email]));
+
+      // console.log(formData);
+      await API.post("/meeting/add", {
+        ...formData,
+        calledByEmail: user.email,
+        membersEmail: allMembers,
+        isGoogle: localStorage.getItem("isGoogle") === "true",
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+
+      await updateUserLinks(formData.id, allMembers);
+      navigate("/");
+    } catch (err) {
+      console.error("Save Error:", err.response?.data || err.message);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      save();
+    }
+  };
+
+  return (
+
+    <div onKeyDown={handleKeyDown} className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20 px-4 md:px-0">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Create Meeting</h1>
+          <p className="text-slate-500 font-medium">Document the discussion, decisions, and action items.</p>
+        </div>
+
+        {/* GOOGLE MEET INTEGRATION BUTTON */}
+        {(user.role === "HR" || user.role === "Admin") && (
+          <button
+            onClick={scheduleGoogleMeet}
+            className={`${localStorage.getItem("isGoogle") === "true" ? "bg-green-500 hover:bg-green-600 text-white" : "bg-white hover:bg-slate-50 border border-slate-200 text-slate-700"} flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl font-bold text-sm shadow-sm hover:border-blue-300 transition-all group`}
+          >
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg"
+              alt="Google Calendar"
+              className="w-5 h-5"
+            />
+            {localStorage.getItem("isGoogle") === "true" ? "Save to confirm" : "Schedule with Google Meet"}
+
+          </button>
+        )}
+      </div>
+
+      <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-6 md:p-8 space-y-8">
+
+          {/* Section 1: Basic Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Meeting Title</label>
+              <input name="title" value={formData.title} onChange={handelChange} placeholder="e.g. Quarterly Product Review" className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:border-blue-500 outline-none font-semibold text-slate-700" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Reference ID</label>
+              <input name="id" value={formData.id} onChange={handelChange} placeholder="e.g. 10401" className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:border-blue-500 outline-none font-semibold text-slate-700" />
+            </div>
+          </div>
+
+          {/* Section 2: Time & Date */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-50">
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Date</label>
+              <input name="date" type="date" value={formData.date} onChange={handelChange} className="w-full px-5 py-3 rounded-2xl border border-slate-200 outline-none font-semibold text-slate-700" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Time</label>
+              <input name="time" type="time" value={formData.time} onChange={handelChange} className="w-full px-5 py-3 rounded-2xl border border-slate-200 outline-none font-semibold text-slate-700" />
+            </div>
+          </div>
+
+          {/* <div className="flex items-center justify-between p-5 bg-white border border-slate-200 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className={`p-3 rounded-2xl ${isAllDept ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400'} transition-colors`}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-800">Department Mode</h4>
+                <p className="text-xs text-slate-500">Include everyone from your team</p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsAllDept(!isAllDept)}
+              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isAllDept ? 'bg-blue-600' : 'bg-slate-200'
+                }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200 ease-in-out ${isAllDept ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+              />
+            </button>
+          </div> */}
+
+          <div className="pt-6 border-t border-slate-50">
+            {/* 1. THE TOGGLE BUTTON */}
+            <div className="flex items-center justify-between p-4 bg-blue-50/50 border border-blue-100 rounded-2xl mb-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 rounded-xl transition-all ${isAllDept ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white text-slate-400 border border-slate-100'}`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-[11px] font-black text-slate-700 uppercase tracking-wider leading-none">Add All Department</h4>
+                  <p className="text-[10px] text-slate-500 font-medium mt-1">
+                    {isAllDept ? "Team mode active" : "Add members manually"}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAllDept(!isAllDept)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAllDept ? 'bg-blue-600' : 'bg-slate-300'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${isAllDept ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-4">
+              Attendees {isAllDept && <span className="text-blue-500 font-black ml-2">— Department Members</span>}
+            </label>
+
+            {/* 2. CONDITIONAL AREA */}
+            {!isAllDept ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {participants.map((email, i) => (
+                    <div key={i} className="relative group animate-in fade-in duration-300">
+                      <div className="flex gap-2 items-center">
+                        <div className="relative flex-1">
+                          <input
+                            value={email}
+                            onChange={(e) => {
+                              updateParticipant(i, e.target.value);
+                              setActiveDropdown(i);
+                            }}
+                            onFocus={() => setActiveDropdown(i)}
+                            placeholder="Search colleague name or email..."
+                            className="w-full px-5 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 outline-none text-sm font-medium transition-all"
+                          />
+
+                          {activeDropdown === i && email.length > 1 && (
+                            <div className="absolute z-50 mt-2 w-full bg-white border border-slate-100 rounded-2xl shadow-xl overflow-hidden">
+                              {/* FIXED: Filter out current user from search results */}
+                              {allUsers
+                                .filter(u =>
+                                  (
+                                    (u.email.toLowerCase().includes(email.toLowerCase()) && (u.department === user.department)) ||
+                                    (u.username.toLowerCase().includes(email.toLowerCase()) && (u.department === user.department))
+                                  ) &&
+                                  u.email !== user?.email // <--- FILTER SELF
+                                )
+                                .map((u) => (
+                                  <button
+                                    key={u._id}
+                                    type="button"
+                                    onClick={() => {
+                                      updateParticipant(i, u.email);
+                                      setActiveDropdown(null);
+                                    }}
+                                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors border-b border-slate-50 last:border-0 text-left"
+                                  >
+                                    <img src={u.profileImg || `https://ui-avatars.com/api/?name=${u.username}`} className="w-8 h-8 rounded-lg bg-slate-100" alt="" />
+                                    <div>
+                                      <p className="text-sm font-bold text-slate-700 leading-tight">{u.username}</p>
+                                      <p className="text-[10px] text-slate-400 font-medium">{u.email}</p>
+                                    </div>
+                                  </button>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                        {participants.length > 1 && (
+                          <button onClick={() => removeParticipant(i)} className="p-2 text-slate-300 hover:text-red-500 rounded-lg">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={addParticipant}
+                  className="mt-6 flex items-center gap-2 text-blue-600 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-50 p-2 transition-colors"
+                >
+                  <span className="text-lg">+</span> Add Attendee
+                </button>
+              </>
+            ) : (
+              /* ALL DEPARTMENT VIEW: Only visible when toggle is ON */
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in slide-in-from-top-2 duration-300">
+                {/* FIXED: Filter out current user from department view */}
+                {allUsers
+                  .filter(u => u.department === user?.department && u.email !== user?.email)
+                  .map((u) => (
+                    <div key={u._id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                      <img src={u.profileImg || `https://ui-avatars.com/api/?name=${u.username}`} className="w-9 h-9 rounded-xl bg-slate-50" alt="" />
+                      <div className="overflow-hidden">
+                        <p className="text-sm font-bold text-slate-700 truncate">{u.username}</p>
+                        <p className="text-[10px] text-blue-500 font-bold uppercase tracking-tight">{u.department}</p>
+                      </div>
+                      <div className="ml-auto">
+                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+
+          {/* Section 3: Participants */}
+
+
+          {/* Section 4: Details */}
+          <div className="pt-6 border-t border-slate-50 space-y-6">
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Agenda</label>
+              <textarea name="agenda" value={formData.agenda} onChange={handelChange} rows="2" placeholder="Purpose of meeting..." className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:border-blue-500 outline-none font-semibold text-slate-700 resize-none" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Meeting Notes</label>
+              <textarea name="note" value={formData.note} onChange={handelChange} rows="4" placeholder="Detailed notes..." className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:border-blue-500 outline-none font-semibold text-slate-700 resize-none" />
+            </div>
+          </div>
+        </div>
+
+        {/* Action Footer */}
+        <div className="bg-slate-50 px-8 py-6 flex flex-col sm:flex-row justify-end gap-3 border-t border-slate-100">
+          <button onClick={() => navigate('/')} className="px-6 py-2.5 rounded-xl cursor-pointer text-sm font-bold text-slate-500 hover:bg-slate-200 transition-all order-2 sm:order-1">
+            Discard
+          </button>
+          <button onClick={save} className="bg-blue-600 text-white px-8 py-2.5 rounded-xl cursor-pointer text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all order-1 sm:order-2">
+            Save Meeting
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CreateMOM;

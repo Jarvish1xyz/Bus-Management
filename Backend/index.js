@@ -7,6 +7,7 @@ const Bus = require('./routes/bus.route');
 const Driver = require('./routes/driver.route');
 const universityRouter = require('./routes/university.route');
 const adminRouter = require('./routes/admin.route');
+const studentRouter = require('./routes/student.route');
 const busRouter = require('./routes/bus.route');
 const driverRouter = require('./routes/driver.route');
 const placeRouter = require('./routes/place.route');
@@ -30,9 +31,12 @@ mongoose.connect(url).then(() => {
 app.use('/auth', authRouter);
 app.use('/api/bus', busRouter);
 app.use('/api/driver', driverRouter);
+console.log("Request is in index")
 app.use('/api/university', universityRouter);
 app.use('/api/admin', adminRouter);
-app.use('/api/place', placeRouter)
+app.use('/api/student', studentRouter);
+app.use('/api/place', placeRouter);
+app.use('/api', adminRouter);
 
 app.listen(5000, '0.0.0.0', () => {
     console.log("Server started @ 5000")

@@ -1,4 +1,8 @@
 const Admin = require('../models/Admin');
+const Place = require('../models/Place');
+const Bus = require('../models/Bus');
+const Driver = require('../models/Driver');
+const Student = require('../models/Student');
 const University = require('../models/University');
 const bcrypt = require('bcrypt');
 
@@ -35,7 +39,7 @@ exports.addAdmin = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+
         const uni = await University.findById(university).select("_id");
 
         const admin = await Admin.create({
@@ -58,4 +62,26 @@ exports.addAdmin = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 
+}
+
+exports.count = async (req, res) => {
+    try {
+        const places = await Place.countDocuments({ university: req.body.university });
+        const buses = await Bus.countDocuments({ university: req.body.university });
+        const drivers = await Driver.countDocuments({ university: req.body.university });
+        const students = await Student.countDocuments({ university: req.body.university });
+
+        const data = {
+            places:5,
+            buses,
+            drivers,
+            students
+        }
+        console.log(data);
+
+        res.status(200).json(data);
+    }
+    catch(err) {
+        res.status(500).json({ error: err.message });
+    }
 }

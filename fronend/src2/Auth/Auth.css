@@ -1,0 +1,14 @@
+/* Auth.css */
+@keyframes textIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-textIn {
+    animation: textIn 0.6s ease-out forwards;
+}
+
+/* Ensure the sliding glass has a nice curve */
+.glass-slider {
+    transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55), border-radius 0.7s ease;
+}

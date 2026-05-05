@@ -28,7 +28,6 @@ exports.addUniversity = async (req, res) => {
             email,
             phone,
         });
-        console.log(uni)
 
         res.status(200).json(uni);
     } catch (err) {

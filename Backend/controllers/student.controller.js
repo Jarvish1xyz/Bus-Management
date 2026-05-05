@@ -24,17 +24,13 @@ exports.getStudentById = async (req, res) => {
 
 exports.addStudent = async (req, res) => {
     try {
-        const { name, email, university, busNo, pickupPoint } = req.body;
+        const { name, email, pickupPoint, university } = req.body;
 
         const uni = await University.findById(university).select("_id");
         if (!uni) {
             return res.status(400).json({ msg: "University not found" });
         }
 
-        const bus = await Bus.findOne({ university: uni._id, busNo: busNo }).select("_id");
-        if (!bus) {
-            return res.status(400).json({ msg: "Bus not found" });
-        }
 
         const existingStudent = await Student.findOne({ email });
         if (existingStudent) {
@@ -42,6 +38,11 @@ exports.addStudent = async (req, res) => {
         }
 
         const place = await Place.findOne({ name: pickupPoint, university }).select("_id");
+        const bus = await Bus.findOne({ university: uni._id, "routes.points": place._id }).select("_id");
+        if (!bus) {
+            return res.status(400).json({ msg: "Bus not found" });
+        }
+        console.log(bus);
 
         const password = email.split('@')[0];
 
@@ -52,19 +53,20 @@ exports.addStudent = async (req, res) => {
             email,
             password: hashedPassword,
             university: uni._id,
-            bus,
+            bus: bus._id,
             pickupPoint: place._id,
         });
+        console.log(student);
 
         res.status(200).json({
             msg: "Student registered successfully",
             student: {
                 id: student._id,
-                studentId: student.studentId,
                 email: student.email
             }
         });
     } catch (err) {
+        console.log(err);
         res.status(500).json({ error: err.message });
     }
 }

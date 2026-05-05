@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 exports.getAllDriver = async (req, res) => {
     try {
-        const driveres = await Driver.find().populate('university');
+        const driveres = await Driver.find({university: req.params.university}).populate('university');
         res.json(driveres);
     } catch (err) {
         res.status(500).json({ error: err.message });

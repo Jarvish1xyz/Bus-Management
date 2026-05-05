@@ -5,7 +5,7 @@ const Place = require('../models/Place');
 
 exports.getAllBus = async (req, res) => {
   try {
-    const buses = await Bus.find().populate('driver').populate('university');
+    const buses = await Bus.find({university: req.params.university}).populate('driver').populate('university');
     res.json(buses);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -14,7 +14,7 @@ exports.getAllBus = async (req, res) => {
 
 exports.getBusById = async (req, res) => {
   try {
-    const bus = await Bus.findOne({ busId: req.params.id }).populate('driver').populate('university');
+    const bus = await Bus.findOne({ busId: req.params.id, university: req.params.universityId }).populate('driver').populate('university');
     res.json(bus);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -34,13 +34,14 @@ exports.addBus = async (req, res) => {
     } = req.body;
 
     // 1. Validate University
-    const uni = await University.findById({ university }).select("_id");
+    const uni = await University.findById(university).select("_id");
     if (!uni) {
       return res.status(400).json({ msg: "University not found" });
     }
 
+
     // 2. Validate Driver
-    const driver = await Driver.findById({ driverId }).select("_id");
+    const driver = await Driver.findById(driverId).select("_id");
     if (!driver) {
       return res.status(400).json({ msg: "Driver not found" });
     }
@@ -49,9 +50,9 @@ exports.addBus = async (req, res) => {
     const formattedRoutes = [];
 
     for (const route of routes) {
-      const { startTime, points } = route;
+      const { shift, startTime, points } = route;
 
-      if (!startTime || !points || !points.length) {
+      if (!shift || !startTime || !points?.length) {
         return res.status(400).json({ msg: "Invalid route format" });
       }
 
@@ -73,7 +74,8 @@ exports.addBus = async (req, res) => {
       }
 
       formattedRoutes.push({
-        startTime: new Date(startTime),
+        shift,
+        startTime,
         points: pointIds
       });
     }
