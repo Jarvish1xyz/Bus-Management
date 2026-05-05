@@ -6,7 +6,7 @@ const Place = require('../models/Place');
 
 exports.getAllStudent = async (req, res) => {
     try {
-        const student = await Student.find().populate('university').populate('bus').populate('pickupPoint');
+        const student = await Student.find({ university: req.body.university }).populate('university').populate('bus').populate('pickupPoint');
         res.status(200).json(student);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -24,7 +24,8 @@ exports.getStudentById = async (req, res) => {
 
 exports.addStudent = async (req, res) => {
     try {
-        const { name, email, pickupPoint, university } = req.body;
+        const { data, university } = req.body;
+        const { name, email, pickupPoint } = data;
 
         const uni = await University.findById(university).select("_id");
         if (!uni) {
@@ -67,6 +68,18 @@ exports.addStudent = async (req, res) => {
         });
     } catch (err) {
         console.log(err);
+        res.status(500).json({ error: err.message });
+    }
+}
+
+exports.deleteStudent = async (req, res) => {
+    try {
+        const student = await Student.findByIdAndDelete(req.params.id);
+        if (!student) {
+            return res.status(404).json({ msg: "Student not found" });
+        }
+        res.json({ msg: "Student deleted successfully" });
+    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 }

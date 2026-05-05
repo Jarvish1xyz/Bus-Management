@@ -53,14 +53,16 @@ const BusManagement = () => {
 
     const handleAddBus = async (busData) => {
         try {
-            await API.post("/api/bus", {
-                ...busData,
+            const res = await API.post("/api/bus/", {
+                busData,
                 university: user.university,
             });
+            console.log(res.data);
 
             triggerNotice("Bus added", "success");
             fetchBuses();
-        } catch {
+        } catch(err) {
+            console.log(err);
             triggerNotice("Error adding bus", "error");
         }
     };
@@ -70,19 +72,22 @@ const BusManagement = () => {
             await API.delete(`/api/bus/${id}`);
             triggerNotice("Bus deleted", "success");
             fetchBuses();
-        } catch {
+        } catch(err) {
+            console.log(err.message);
             triggerNotice("Error deleting bus", "error");
         }
     };
 
     return (
-        <BusList
-            buses={buses}
-            drivers={drivers}
-            places={places}
-            onDelete={handleDeleteBus}
-            onAdd={handleAddBus}
-        />
+        <div className="min-h-screen bg-[#f8fafc]">
+            <BusList
+                buses={buses}
+                drivers={drivers}
+                places={places}
+                onDelete={handleDeleteBus}
+                onAdd={handleAddBus}
+            />
+        </div>
     );
 };
 

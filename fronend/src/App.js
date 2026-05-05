@@ -9,6 +9,8 @@ import RegistrationPage from "./pages/RegistrationPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import PlaceManagement from "./pages/admin/PlaceManagement";
 import BusManagement from "./pages/admin/BusManagement";
+import DriverManagement from "./pages/admin/DriverManagement";
+import StudentManagement from "./pages/admin/StudentManagement";
 import Loading from "./components/pages/Loading";
 
 function App() {
@@ -80,6 +82,8 @@ function App() {
                 <>
                   <Route path="/places" element={<PlaceManagement />} />
                   <Route path="/buses" element={<BusManagement />} />
+                  <Route path="/drivers" element={<DriverManagement />} />
+                  <Route path="/students" element={<StudentManagement />} />
                 </>
               )}
             </Route>

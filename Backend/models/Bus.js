@@ -7,21 +7,9 @@ const busSchema = new mongoose.Schema(
         driver: { type: mongoose.Schema.Types.ObjectId, ref: "Driver", required: true },
         routes: [
             {
-                shift: {
-                    type: String,
-                    enum: ["First", "Second"],
-                    required: true
-                },
-                startTime: {
-                    type: String,
-                    required: true
-                },
-                points: [
-                    {
-                        type: mongoose.Schema.Types.ObjectId,
-                        ref: "Place"
-                    }
-                ]
+                shift: { type: String, enum: ['First', 'Second'] },
+                startTime: { type: String, required: true },
+                points: [{ type: mongoose.Schema.Types.ObjectId, ref: "Place" }]
             }
         ],
         lastServiced: { type: Date, default: Date.now },

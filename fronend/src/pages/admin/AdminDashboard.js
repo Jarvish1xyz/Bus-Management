@@ -87,13 +87,6 @@ function AdminDashboard() {
         },
     ]
 
-    const handelClick = (label) => {
-        if (label === "Places") navigate("/places");
-        else if (label === "Buses") navigate("/buses");
-        else if (label === "Drivers") navigate("/drivers");
-        else if (label === "Students") navigate("/students");
-    }
-
     // --- DYNAMIC STATE LOGIC ---
     // We filter the meetings array based on the 'status' field from your backend model
     // const pendingCount = meeting.filter(m => m.status === 'Pending').length;
@@ -133,7 +126,6 @@ function AdminDashboard() {
                     <div
                         key={i}
                         className="group cursor-pointer relative overflow-hidden bg-white p-7 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-500"
-                        onClick={() => handelClick(stat.label)}
                     >
                         {/* Dynamic Background Glow */}
                         <div className={`absolute -right-4 -top-4 w-24 h-24 ${stat.lightBg} rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700`}></div>

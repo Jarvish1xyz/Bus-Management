@@ -48,7 +48,6 @@ exports.addAdmin = async (req, res) => {
             password: hashedPassword,
             university: uni._id,
         });
-        console.log(admin);
 
         res.status(200).json({
             msg: "Admin registered successfully",
@@ -72,7 +71,7 @@ exports.count = async (req, res) => {
         const students = await Student.countDocuments({ university: req.body.university });
 
         const data = {
-            places:5,
+            places,
             buses,
             drivers,
             students

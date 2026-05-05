@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const driverSchema = new mongoose.Schema(
     {
         name: { type: String, required: true },
-        Salary: { type: Number, required: true },
+        salary: { type: Number, required: true },
         shift: { type: String, enum: ['First', 'Second', 'Both'] },
         address: String,
         email: { type: String, required: true, unique: true, lowercase: true },

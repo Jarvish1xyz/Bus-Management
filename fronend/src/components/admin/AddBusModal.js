@@ -48,6 +48,7 @@ const AddBusModal = ({ onClose, onAdd, drivers = [], places = [] }) => {
 
     if (form.shift === "First" || form.shift === "Both") {
       routes.push({
+        shift: "First", // ✅ ADD THIS
         startTime: form.routes.first.startTime,
         points: form.routes.first.points,
       });
@@ -55,6 +56,7 @@ const AddBusModal = ({ onClose, onAdd, drivers = [], places = [] }) => {
 
     if (form.shift === "Second" || form.shift === "Both") {
       routes.push({
+        shift: "Second", // ✅ ADD THIS
         startTime: form.routes.second.startTime,
         points: form.routes.second.points,
       });
@@ -142,11 +144,10 @@ const AddBusModal = ({ onClose, onAdd, drivers = [], places = [] }) => {
               <button
                 key={p._id}
                 onClick={() => togglePlace(shiftKey, p.name)}
-                className={`px-3 py-2 rounded-xl text-sm font-semibold border transition ${
-                  form.routes[shiftKey].points.includes(p.name)
+                className={`px-3 py-2 rounded-xl text-sm font-semibold border transition ${form.routes[shiftKey].points.includes(p.name)
                     ? "bg-blue-600 text-white border-blue-600"
                     : "bg-slate-50 text-slate-600 border-slate-200"
-                }`}
+                  }`}
               >
                 <MapPin size={14} className="inline mr-1" />
                 {p.name}

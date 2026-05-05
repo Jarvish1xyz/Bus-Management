@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 
 exports.getAllDriver = async (req, res) => {
     try {
-        const driveres = await Driver.find({university: req.params.university}).populate('university');
+        const driveres = await Driver.find({ university: req.body.university }).populate('university');
         res.json(driveres);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -24,7 +24,9 @@ exports.getDriverById = async (req, res) => {
 exports.addDriver = async (req, res) => {
     try {
 
-        const { name, Salary, shift, address, email, phone, university } = req.body;
+        const { data, university } = req.body;
+        console.log(data);
+        const { name, salary, shift, address, email, phone } = data;
 
         const existingDriver = await Driver.findOne({ email });
         if (existingDriver) {
@@ -39,7 +41,7 @@ exports.addDriver = async (req, res) => {
 
         const driver = await Driver.create({
             name,
-            Salary,
+            salary,
             shift,
             address,
             email,
@@ -52,6 +54,18 @@ exports.addDriver = async (req, res) => {
             msg: 'New Driver Added successfully',
             driver,
         })
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+exports.deleteDriver = async (req, res) => {
+    try {
+        const driver = await Driver.findByIdAndDelete(req.params.id);
+        if (!driver) {
+            return res.status(404).json({ msg: "Driver not found" });
+        }
+        res.json({ msg: "Driver deleted successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

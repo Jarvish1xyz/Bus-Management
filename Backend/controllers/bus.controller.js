@@ -5,7 +5,7 @@ const Place = require('../models/Place');
 
 exports.getAllBus = async (req, res) => {
   try {
-    const buses = await Bus.find({university: req.params.university}).populate('driver').populate('university');
+    const buses = await Bus.find({ university: req.body.university }).populate('driver').populate('university');
     res.json(buses);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -23,28 +23,24 @@ exports.getBusById = async (req, res) => {
 
 exports.addBus = async (req, res) => {
   try {
-    const {
-      busNo,
-      numberPlate,
-      driverId,
-      shift,
-      routes,
-      lastServiced,
-      university
-    } = req.body;
+    const { busData, university } = req.body;
+    console.log(busData)
+    const { busNo, numberPlate, driverId, shift, routes, lastServiced } = busData;
 
     // 1. Validate University
     const uni = await University.findById(university).select("_id");
     if (!uni) {
       return res.status(400).json({ msg: "University not found" });
     }
-
-
+    console.log(uni);
+    
+    
     // 2. Validate Driver
     const driver = await Driver.findById(driverId).select("_id");
     if (!driver) {
       return res.status(400).json({ msg: "Driver not found" });
     }
+    console.log(driver);
 
     // 3. Convert routes (place names -> ObjectIds)
     const formattedRoutes = [];
@@ -55,6 +51,7 @@ exports.addBus = async (req, res) => {
       if (!shift || !startTime || !points?.length) {
         return res.status(400).json({ msg: "Invalid route format" });
       }
+      console.log(points)
 
       const pointIds = [];
 
@@ -101,3 +98,15 @@ exports.addBus = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.deleteBus = async (req, res) => {
+  try {
+    const bus = await Bus.findByIdAndDelete(req.params.id);
+    if (!bus) {
+      return res.status(404).json({ msg: "Bus not found" });
+    }
+    res.json({ msg: "Bus deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
