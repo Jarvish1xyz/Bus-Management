@@ -14,7 +14,14 @@ exports.getAllBus = async (req, res) => {
 
 exports.getBusById = async (req, res) => {
   try {
-    const bus = await Bus.findOne({ busId: req.params.id, university: req.params.universityId }).populate('driver').populate('university');
+    const bus = await Bus.findById(req.params.id)
+      .populate('driver')
+      .populate('university')
+      .populate({
+        path: "routes.points",
+        select: "name"
+      });
+
     res.json(bus);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -24,7 +31,7 @@ exports.getBusById = async (req, res) => {
 exports.addBus = async (req, res) => {
   try {
     const { busData, university } = req.body;
-    console.log(busData)
+    // console.log(busData)
     const { busNo, numberPlate, driverId, shift, routes, lastServiced } = busData;
 
     // 1. Validate University
@@ -32,15 +39,14 @@ exports.addBus = async (req, res) => {
     if (!uni) {
       return res.status(400).json({ msg: "University not found" });
     }
-    console.log(uni);
-    
-    
+
+
     // 2. Validate Driver
     const driver = await Driver.findById(driverId).select("_id");
     if (!driver) {
       return res.status(400).json({ msg: "Driver not found" });
     }
-    console.log(driver);
+    // console.log(driver);
 
     // 3. Convert routes (place names -> ObjectIds)
     const formattedRoutes = [];
@@ -51,7 +57,7 @@ exports.addBus = async (req, res) => {
       if (!shift || !startTime || !points?.length) {
         return res.status(400).json({ msg: "Invalid route format" });
       }
-      console.log(points)
+      // console.log(points)
 
       const pointIds = [];
 
@@ -110,3 +116,100 @@ exports.deleteBus = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 }
+
+exports.getForDriver = async (req, res) => {
+  try {
+    // console.log(req.body);
+    const bus = await Bus.findOne({ driver: req.body.driver })
+      .populate('driver')
+      .populate({
+        path: "routes.points",
+        select: "name"
+      });
+    if (!bus) {
+      return res.status(404).json({ msg: "No bus assigned to this driver" });
+    }
+    res.json(bus);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+
+exports.updateBus = async (req, res) => {
+  try {
+
+    const {
+      busNo,
+      numberPlate,
+      driver,
+      lastServiced,
+      routes
+    } = req.body;
+
+    // convert routes
+    const formattedRoutes = [];
+
+    for (const route of routes) {
+
+      const pointIds = [];
+
+      for (const pointId of route.points) {
+
+        const place = await Place.findById(pointId);
+
+        if (!place) {
+          return res.status(404).json({
+            msg: "Place not found"
+          });
+        }
+
+        pointIds.push(place._id);
+      }
+
+      formattedRoutes.push({
+        shift: route.shift,
+        startTime: route.startTime,
+        points: pointIds
+      });
+    }
+
+    const updatedBus = await Bus.findByIdAndUpdate(
+      req.params.id,
+      {
+        busNo,
+        numberPlate,
+        driver,
+        lastServiced,
+        routes: formattedRoutes
+      },
+      {
+        returnDocument: "after"
+      }
+    )
+      .populate("driver")
+      .populate({
+        path: "routes.points",
+        select: "name"
+      });
+
+    if (!updatedBus) {
+      return res.status(404).json({
+        msg: "Bus not found"
+      });
+    }
+
+    res.json({
+      msg: "Bus updated successfully",
+      bus: updatedBus
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+  }
+};  

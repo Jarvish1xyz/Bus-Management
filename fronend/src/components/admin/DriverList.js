@@ -1,11 +1,20 @@
 import React, { useState } from "react";
 import { User, Plus, Trash2, ChevronLeft } from "lucide-react";
 import AddDriverModal from "./AddDriverModal";
+import DriverModal from "./DriverModal";
 import { useNavigate } from "react-router-dom";
+//1552 5+1 0
 
 const DriverList = ({ drivers, onDelete, onAdd }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDriverModal, setIsDriverModal] = useState(false);
+    const [idOfDriver, setIdOfDriver] = useState("");
     const navigate = useNavigate();
+
+    const handleDriverModal = (driverId) => {
+        setIdOfDriver(driverId);
+        setIsDriverModal(true);
+    }
 
     return (
         <div className="p-3 min-h-screen bg-[#f8fafc]">
@@ -42,7 +51,8 @@ const DriverList = ({ drivers, onDelete, onAdd }) => {
                     {drivers.map((driver, index) => (
                         <div
                             key={driver._id || index}
-                            className="flex items-center justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition"
+                            className="flex items-center cursor-pointer justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition"
+                            onClick={() => handleDriverModal(driver._id)}
                         >
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
@@ -75,6 +85,13 @@ const DriverList = ({ drivers, onDelete, onAdd }) => {
                             onAdd(data);
                             setIsModalOpen(false);
                         }}
+                    />
+                )}
+
+                {isDriverModal && (
+                    <DriverModal
+                        driverId={idOfDriver}
+                        onClose={() => setIsDriverModal(false)}
                     />
                 )}
             </div>

@@ -33,7 +33,7 @@ const LoginPage = ({ onLoginSuccess }) => {
             <button
               key={r.id}
               onClick={() => setRole(r.id)}
-              className={`relative z-10 w-1/3 py-2 text-sm font-bold transition-colors duration-300 ${role === r.id ? 'text-blue-600' : 'text-slate-400'}`}
+              className={`relative cursor-pointer z-10 w-1/3 py-2 text-sm font-bold transition-colors duration-300 ${role === r.id ? 'text-blue-600' : 'text-slate-400'}`}
             >
               {r.label}
             </button>

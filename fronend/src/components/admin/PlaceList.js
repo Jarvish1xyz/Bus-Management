@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { MapPin, Plus, Trash2, Map as MapIcon } from 'lucide-react';
 import AddPlaceModal from './AddPlaceModal';
+import PlaceModal from './PlaceModal';
 import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const PlaceList = ({ places, onDelete, onSaveBatch }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPlaceModal, setIsPlaceModal] = useState(false);
+    const [idOfPlace, setIdOfPlace] = useState("");
     const navigate = useNavigate();
+
+    const handlePlaceModal = (placeId) => {
+        setIdOfPlace(placeId);
+        setIsPlaceModal(true);
+    }
 
     return (
         <div className="p-3 min-h-screen bg-[#f8fafc]">
@@ -41,7 +49,8 @@ const PlaceList = ({ places, onDelete, onSaveBatch }) => {
                     {places.map((place, index) => (
                         <div
                             key={place._id || index}
-                            className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all"
+                            className="flex items-center cursor-pointer justify-between bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all"
+                            onClick={() => handlePlaceModal(place._id)}
                         >
                             {/* Left Section */}
                             <div className="flex items-center gap-4">
@@ -78,6 +87,13 @@ const PlaceList = ({ places, onDelete, onSaveBatch }) => {
                             onSaveBatch(data); // This calls handleAddPlaces in PlaceManagement.js
                             setIsModalOpen(false);
                         }}
+                    />
+                )}
+
+                {isPlaceModal && (
+                    <PlaceModal
+                        onClose={() => setIsPlaceModal(false)}
+                        placeId = {idOfPlace}
                     />
                 )}
             </div>

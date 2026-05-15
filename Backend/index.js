@@ -31,7 +31,7 @@ mongoose.connect(url).then(() => {
 app.use('/auth', authRouter);
 app.use('/api/bus', busRouter);
 app.use('/api/driver', driverRouter);
-console.log("Request is in index")
+// console.log("Request is in index")
 app.use('/api/university', universityRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/student', studentRouter);

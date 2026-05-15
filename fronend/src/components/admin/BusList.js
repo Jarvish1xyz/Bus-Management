@@ -2,10 +2,18 @@ import React, { useState } from "react";
 import { Bus, Plus, Trash2, ChevronLeft } from "lucide-react";
 import AddBusModal from "./AddBusModal";
 import { useNavigate } from "react-router-dom";
+import BusModal from "./BusModal";
 
 const BusList = ({ buses, drivers, places, onDelete, onAdd }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isBusModal, setIsBusModal] = useState(false);
+    const [idOfBus, setIdOfBus] = useState("");
     const navigate = useNavigate();
+
+    const handleBusModal = (busId) => {
+        setIdOfBus(busId);
+        setIsBusModal(true);
+    }
 
     return (
         <div className="p-3 min-h-screen bg-[#f8fafc]">
@@ -36,12 +44,13 @@ const BusList = ({ buses, drivers, places, onDelete, onAdd }) => {
                     </button>
                 </div>
 
-                {/* List */}
+                {/* List 3.33 2.10*/}
                 <div className="space-y-4 grid grid-cols-1 md:grid-cols-3 gap-3">
                     {buses.map((bus, index) => (
                         <div
                             key={bus._id || index}
-                            className="flex items-center justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition"
+                            className="flex items-center cursor-pointer justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition"
+                            onClick={() => handleBusModal(bus._id)}
                         >
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-blue-50 rounded-lg text-blue-600">
@@ -60,8 +69,8 @@ const BusList = ({ buses, drivers, places, onDelete, onAdd }) => {
                                             <span
                                                 key={i}
                                                 className={`text-[10px] px-2 py-1 rounded-full font-bold ${r.shift === "First"
-                                                        ? "bg-blue-50 text-blue-600"
-                                                        : "bg-purple-50 text-purple-600"
+                                                    ? "bg-blue-50 text-blue-600"
+                                                    : "bg-purple-50 text-purple-600"
                                                     }`}
                                             >
                                                 {r.shift}
@@ -88,6 +97,19 @@ const BusList = ({ buses, drivers, places, onDelete, onAdd }) => {
                         onAdd={onAdd}
                         drivers={drivers}
                         places={places}
+                    />
+                )}
+
+                {isBusModal && (
+                    <BusModal
+                        busId={idOfBus}
+                        drivers={drivers}
+                        places={places}
+                        onClose={() => setIsBusModal(false)}
+                        onUpdated={() => {
+                            setIsBusModal(false);
+                            window.location.reload();
+                        }}
                     />
                 )}
             </div>

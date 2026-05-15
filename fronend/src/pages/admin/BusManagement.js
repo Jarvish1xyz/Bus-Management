@@ -53,11 +53,10 @@ const BusManagement = () => {
 
     const handleAddBus = async (busData) => {
         try {
-            const res = await API.post("/api/bus/", {
+            await API.post("/api/bus/", {
                 busData,
                 university: user.university,
             });
-            console.log(res.data);
 
             triggerNotice("Bus added", "success");
             fetchBuses();

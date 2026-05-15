@@ -96,7 +96,7 @@ const RegistrationPage = () => {
             <button
               onClick={handleDeploy}
               disabled={loading}
-              className="group relative px-16 py-5 bg-blue-600 rounded-2xl font-black text-white shadow-[0_20px_40px_-10px_rgba(37,99,235,0.4)] hover:bg-blue-700 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-70"
+              className="group cursor-pointer relative px-16 py-5 bg-blue-600 rounded-2xl font-black text-white shadow-[0_20px_40px_-10px_rgba(37,99,235,0.4)] hover:bg-blue-700 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-70"
             >
               <span className="flex items-center gap-3">
                 {loading ? "DEPLOYING..." : "DEPLOY SYSTEM"}

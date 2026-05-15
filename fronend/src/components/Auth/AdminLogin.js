@@ -40,7 +40,7 @@ export default function AdminLogin({ onLoginSuccess }) {
                 placeholder="Password"
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
-            <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition-all active:scale-95">
+            <button className="w-full cursor-pointer bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition-all active:scale-95">
                 ADMIN LOG IN
             </button>
         </form>

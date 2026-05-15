@@ -1,12 +1,15 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loading from "../../components/pages/Loading";
-import { Bus, MapPin, UserRound, GraduationCap } from 'lucide-react';
+import { 
+    Bus, MapPin, UserRound, GraduationCap, 
+    Plus, ArrowUpRight, Activity, ShieldCheck, 
+    Clock, AlertCircle 
+} from 'lucide-react';
 import API from "../../api";
+import { useNavigate } from "react-router-dom";
 
 function AdminDashboard() {
     const navigate = useNavigate();
-
     const [user, setUser] = useState(null);
     const [count, setCount] = useState({
         places: 0,
@@ -16,9 +19,6 @@ function AdminDashboard() {
     });
     const [loading, setLoading] = useState(true);
 
-    console.log("Dashboard Rendered");
-
-    // ✅ ALWAYS run hooks first
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user") || "null");
         setUser(storedUser);
@@ -32,7 +32,6 @@ function AdminDashboard() {
                 const res = await API.post("/api/count", {
                     university: user.university
                 });
-
                 setCount(res.data);
             } catch (err) {
                 console.log(err.message);
@@ -45,206 +44,123 @@ function AdminDashboard() {
     }, [user?.university]);
 
     const countData = [
-        {
-            label: "Places",
-            value: count.places || 0,
-            icon: (
-                <MapPin />
-            ),
-            color: "text-cyan-700",
-            bg: "bg-cyan-700",
-            lightBg: "bg-cyan-50",
-        },
-        {
-            label: "Drivers",
-            value: count.drivers || 0,
-            icon: (
-                <UserRound />
-            ),
-            color: "text-emerald-600",
-            bg: "bg-emerald-600",
-            lightBg: "bg-emerald-50",
-        },
-        {
-            label: "Buses",
-            value: count.buses || 0,
-            icon: (
-                <Bus />
-            ),
-            color: "text-amber-600",
-            bg: "bg-amber-600",
-            lightBg: "bg-amber-50",
-        },
-        {
-            label: "Students",
-            value: count.students || 0,
-            icon: (
-                <GraduationCap />
-            ),
-            color: "text-blue-600",
-            bg: "bg-blue-600",
-            lightBg: "bg-blue-50",
-        },
-    ]
-
-    // --- DYNAMIC STATE LOGIC ---
-    // We filter the meetings array based on the 'status' field from your backend model
-    // const pendingCount = meeting.filter(m => m.status === 'Pending').length;
-    // const doneCount = meeting.filter(m => m.status === 'Done').length;
+        { label: "Places", value: count.places, icon: <MapPin size={20}/>, color: "text-cyan-700", bg: "bg-cyan-700", lightBg: "bg-cyan-50" },
+        { label: "Drivers", value: count.drivers, icon: <UserRound size={20}/>, color: "text-emerald-600", bg: "bg-emerald-600", lightBg: "bg-emerald-50" },
+        { label: "Buses", value: count.buses, icon: <Bus size={20}/>, color: "text-amber-600", bg: "bg-amber-600", lightBg: "bg-amber-50" },
+        { label: "Students", value: count.students, icon: <GraduationCap size={20}/>, color: "text-blue-600", bg: "bg-blue-600", lightBg: "bg-blue-50" },
+    ];
 
     if (!user || loading) return <Loading />;
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="w-full px-8 pb-12 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header Section */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">
-                        Dashboard
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                        Admin Overview
                     </h1>
-                    <p className="text-slate-500 font-medium mt-1">
-                        Welcome back,{" "}
-                        <span className="text-blue-600 font-bold">
-                            {user.name || "User"}
-                        </span>
+                    <p className="text-slate-500 font-medium">
+                        Managing <span className="text-blue-600 decoration-2 ">{count.uni}</span>'s transport hub.
                     </p>
                 </div>
-                {/* {(user.role === "HR" || user.role === "Admin") && (
-          <button
-            onClick={() => navigate("/create-meeting")}
-            className="group cursor-pointer relative flex items-center gap-2 bg-blue-600 text-white px-7 py-3.5 rounded-2xl font-bold shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:-translate-y-1 active:scale-95"
-          >
-            <span className="text-xl leading-none">+</span>
-            Create Meeting
-          </button>
-        )} */}
             </div>
 
-            {/* Stats Grid - Updated with Icons and Dynamic Logic */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {countData.map((stat, i) => (
-                    <div
-                        key={i}
-                        className="group cursor-pointer relative overflow-hidden bg-white p-7 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-500"
-                    >
-                        {/* Dynamic Background Glow */}
-                        <div className={`absolute -right-4 -top-4 w-24 h-24 ${stat.lightBg} rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700`}></div>
-
-                        <div className="relative z-10 flex flex-col gap-4">
-                            {/* Icon Header */}
-                            <div className={`w-12 h-12 ${stat.lightBg} ${stat.color} rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                    <div key={i} className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-200 transition-all">
+                        <div className="flex justify-between items-start">
+                            <div className={`p-3 ${stat.lightBg} ${stat.color} rounded-xl`}>
                                 {stat.icon}
                             </div>
-
-                            <div>
-                                <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                    {stat.label}
-                                </span>
-                                <div className="flex items-baseline gap-1">
-                                    <h2 className={`text-4xl font-black ${stat.color} mt-1 tracking-tight`}>
-                                        {stat.value}
-                                    </h2>
-                                    <span className="text-[10px] font-bold text-slate-300 uppercase italic tracking-tighter">
-                                        Current
-                                    </span>
-                                </div>
-                            </div>
+                            {/* <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                                <ArrowUpRight size={10} /> 12%
+                            </span> */}
                         </div>
-
-                        {/* Progress Bar Animation */}
-                        <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-50">
-                            <div
-                                className={`h-full ${stat.bg} opacity-20 w-1/3 group-hover:w-full transition-all duration-1000`}
-                            ></div>
+                        <div className="mt-4">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                            <h2 className="text-3xl font-black text-slate-800">{stat.value}</h2>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Recent Meetings Table */}
-            {/* <div className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
-                <div className="px-10 py-7 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <div>
-                        <h2 className="text-xl font-black text-slate-800 tracking-tight">
-                            Recent Sessions
-                        </h2>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                            Last updated: Just now
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter">
-                            Live Database
-                        </span>
-                    </div>
-                </div>
-
-                <div className="divide-y divide-slate-50">
-                    {meeting.length > 0 ? (
-                        [...meeting].reverse().map((m, i) => {
-                            const dateObj = new Date(m.Date);
-                            return (
-                                <div
-                                    key={i}
-                                    className="px-10 py-6 flex items-center justify-between hover:bg-slate-50/80 transition-all group border-b border-slate-50 last:border-0"
-                                >
-                                    <div className="flex items-center gap-8">
-                                        <div className="w-14 h-14 bg-white border border-slate-200 rounded-2xl flex flex-col items-center justify-center shadow-sm group-hover:border-blue-300 group-hover:shadow-blue-50 transition-all duration-300">
-                                            <span className="text-[9px] font-bold text-blue-600 uppercase tracking-tighter leading-none">
-                                                {dateObj.toLocaleString("en", { month: "short" })}
-                                            </span>
-                                            <span className="text-xl font-bold text-slate-800 leading-none mt-1">
-                                                {dateObj.getDate()}
-                                            </span>
-                                        </div>
-
-                                        <div>
-                                            <h4 className="font-bold text-slate-800 text-lg tracking-tight group-hover:text-blue-600 transition-colors duration-300">
-                                                {m.title}
-                                            </h4>
-
-                                            <div className="flex items-center gap-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
-                                                <span className="flex items-center gap-1.5">
-                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                                    </svg>
-                                                    {m.meetingid}
-                                                </span>
-                                                <span className="text-slate-200 font-normal">|</span>
-                                                <span className="flex items-center gap-1.5">
-                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                    {dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                                                </span>
-                                                
-                                                <span className="text-slate-200 font-normal">|</span>
-                                                <span className={`font-black ${m.status === 'Done' ? 'text-emerald-500' : 'text-amber-500'}`}>
-                                                    {m.status}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        onClick={() => navigate(`/meeting/${m.meetingid}`)}
-                                        className="bg-slate-50 cursor-pointer text-slate-500 border border-slate-200 px-5 py-2 rounded-xl font-bold text-[11px] uppercase tracking-wider hover:bg-blue-600 hover:text-white hover:border-blue-600 hover:shadow-lg hover:shadow-blue-100 transition-all duration-300"
-                                    >
-                                        View Details
-                                    </button>
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <div className="p-20 text-center">
-                            <p className="text-slate-400 font-bold italic">
-                                No meetings found. Start by creating one!
-                            </p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Activity Column */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Recent Activity Table-Style */}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                <Clock size={18} className="text-blue-500" /> Recent Operations
+                            </h3>
+                            <button className="text-xs font-bold text-blue-600 hover:underline">View All</button>
                         </div>
-                    )}
+                        <div className="divide-y divide-slate-50">
+                            {[
+                                { msg: "Bus B-204 departed for Route 7", time: "2 mins ago", type: "bus" },
+                                { msg: "New Student: Rahul Sharma registered", time: "15 mins ago", type: "user" },
+                                { msg: "Maintenance alert for Bus A-102", time: "1 hour ago", type: "alert" },
+                            ].map((item, idx) => (
+                                <div key={idx} className="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-2 h-2 rounded-full ${item.type === 'alert' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
+                                        <span className="text-sm text-slate-600 font-medium">{item.msg}</span>
+                                    </div>
+                                    <span className="text-xs text-slate-400">{item.time}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Quick Shortcuts */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div onClick={() => {
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                            navigate('/buses')
+                        }} className="p-4 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl text-white cursor-pointer hover:scale-[1.02] transition-transform">
+                            <Bus className="mb-2 opacity-50" />
+                            <p className="font-bold">Manage Fleet</p>
+                            <p className="text-[10px] opacity-60">Assign drivers & routes</p>
+                        </div>
+                        <div className="p-4 bg-white border border-slate-200 rounded-2xl text-slate-800 cursor-pointer hover:bg-slate-50 transition-all">
+                            <ShieldCheck className="mb-2 text-emerald-500" />
+                            <p className="font-bold">Safety Logs</p>
+                            <p className="text-[10px] text-slate-400">View daily inspections</p>
+                        </div>
+                    </div>
                 </div>
-            </div> */}
+
+                {/* Right Sidebar Column */}
+                <div className="space-y-6">
+                    {/* System Status Card */}
+                    <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-200 relative overflow-hidden">
+                        <div className="relative z-10">
+                            <h3 className="font-bold text-lg mb-4">System Status</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="flex justify-between text-xs mb-1">
+                                        <span>Fleet Utilization</span>
+                                        <span>80%</span>
+                                    </div>
+                                    <div className="w-full bg-blue-400/30 h-1.5 rounded-full">
+                                        <div className="bg-white h-full w-[80%] rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 bg-white/10 p-3 rounded-xl">
+                                    <AlertCircle size={18} />
+                                    <div>
+                                        <p className="text-xs font-bold">2 Buses Offline</p>
+                                        <p className="text-[10px] opacity-70">Requires immediate service</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

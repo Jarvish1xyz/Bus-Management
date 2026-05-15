@@ -7,6 +7,11 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import DriverDashboard from "./pages/driver/DriverDashboard";
+import StudentDashboard from "./pages/student/StudentDashboard";
+import AdminProfile from "./pages/admin/AdminProfile";
+import DriverProfile from "./pages/driver/DriverProfile";
+import StudentProfile from "./pages/student/StudentProfile";
 import PlaceManagement from "./pages/admin/PlaceManagement";
 import BusManagement from "./pages/admin/BusManagement";
 import DriverManagement from "./pages/admin/DriverManagement";
@@ -25,7 +30,7 @@ function App() {
 
   const [isLogin, setIsLogin] = useState(() => !!localStorage.getItem("token"));
 
-  console.log("APP STATE:", { isLogin, user });
+  // console.log("APP STATE:", { isLogin, user });
 
   // ✅ Load user only when login state changes
   useEffect(() => {
@@ -43,7 +48,6 @@ function App() {
 
     setIsLogin(!!token);
     setUser(storedUser);
-    console.log("ROUTE CHECK", { isLogin, user });
   };
 
   if (authLoading) {
@@ -69,11 +73,11 @@ function App() {
                 user?.role === "admin" ? (
                   <AdminDashboard />
                 ) : user?.role === "driver" ? (
-                  <div>Driver Dashboard</div>
+                  <DriverDashboard />
                 ) : user?.role === "student" ? (
-                  <div>Student Dashboard</div>
+                  <StudentDashboard />
                 ) : (
-                  <Navigate to="/login" />  // ❗ instead of <Loading />
+                  <Navigate to="/login" />
                 )
               }
               />
@@ -86,6 +90,10 @@ function App() {
                   <Route path="/students" element={<StudentManagement />} />
                 </>
               )}
+
+              <Route path="/admin/profile" element={<AdminProfile />} />
+              <Route path="/driver/profile" element={<DriverProfile />} />
+              <Route path="/student/profile" element={<StudentProfile />} />
             </Route>
           )}
           {/* PUBLIC */}

@@ -53,7 +53,7 @@ function Navbar({ onLineClick }) {
           </div>
 
           <span className="text-xl font-black text-slate-800 tracking-tight flex items-center">
-            MOM<span className="text-blue-600">Pro</span>
+            Bus <span className="text-blue-600"> Management</span>
           </span>
         </div>
       </div>

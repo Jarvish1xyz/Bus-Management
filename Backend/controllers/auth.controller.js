@@ -13,7 +13,7 @@ exports.adminLogin = async (req, res) => {
             return res.status(400).json({ msg: "All fields required" });
         }
 
-        const admin = await Admin.findOne({ email });
+        const admin = await Admin.findOne({ email }).populate("university", "name");
         if (!admin) {
             return res.status(400).json({ msg: "Invalid credentials" });
         }
@@ -41,7 +41,8 @@ exports.adminLogin = async (req, res) => {
                 email: admin.email,
                 role: "admin",
                 name: admin.name,
-                university: admin.university,
+                university: admin.university._id,
+                universityName: admin.university.name
             }
         });
 
@@ -58,7 +59,7 @@ exports.driverLogin = async (req, res) => {
             return res.status(400).json({ msg: "All fields required" });
         }
 
-        const driver = await Driver.findOne({ email });
+        const driver = await Driver.findOne({ email }).populate("university", "name");
         if (!driver) {
             return res.status(400).json({ msg: "Invalid credentials" });
         }
@@ -86,7 +87,8 @@ exports.driverLogin = async (req, res) => {
                 email: driver.email,
                 role: "driver",
                 name: driver.name,
-                university: driver.university,
+                university: driver.university._id,
+                universityName: driver.university.name
             }
         });
 
@@ -102,7 +104,7 @@ exports.studentLogin = async (req, res) => {
             return res.status(400).json({ msg: "All fields required" });
         }
 
-        const student = await Student.findOne({ email });
+        const student = await Student.findOne({ email }).populate("university", "name");
         if (!student) {
             return res.status(400).json({ msg: "Invalid credentials" });
         }
@@ -130,7 +132,8 @@ exports.studentLogin = async (req, res) => {
                 email: student.email,
                 role: "student",
                 name: student.name,
-                university: student.university,
+                university: student.university._id,
+                universityName: student.university.name
             }
         });
 

@@ -3,7 +3,7 @@ import API from "../../api";
 import { useNotice } from '../../NoticeContext';
 import { useNavigate } from 'react-router-dom';
 
-export default function DriverLogin() {
+export default function DriverLogin({onLoginSuccess}) {
     const [form, setForm] = useState({ email: "", password: "" });
     const { triggerNotice } = useNotice();
     const navigate = useNavigate();
@@ -14,8 +14,9 @@ export default function DriverLogin() {
             const res = await API.post("/auth/driver/login", form);
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
+            onLoginSuccess();
             triggerNotice("Driver login successful", "success");
-            navigate("/driver/dashboard");
+            navigate("/");
         } catch (err) {
             triggerNotice("Driver access denied", "error");
         }
@@ -34,7 +35,7 @@ export default function DriverLogin() {
                 placeholder="Password"
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
-            <button className="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-black transition-all active:scale-95">
+            <button className="w-full cursor-pointer bg-slate-800 text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-black transition-all active:scale-95">
                 DRIVER LOG IN
             </button>
         </form>

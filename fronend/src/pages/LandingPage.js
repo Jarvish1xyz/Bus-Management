@@ -17,13 +17,13 @@ const LandingPage = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
           <button 
             onClick={() => navigate('/login')}
-            className="px-10 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
+            className="px-10 py-4 cursor-pointer bg-blue-600 text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
           >
             Go to Portal
           </button>
           <button 
             onClick={() => navigate('/register')}
-            className="px-10 py-4 border-2 border-blue-600 text-blue-600 rounded-2xl font-bold hover:bg-blue-50 transition-all active:scale-95"
+            className="px-10 py-4 cursor-pointer border-2 border-blue-600 text-blue-600 rounded-2xl font-bold hover:bg-blue-50 transition-all active:scale-95"
           >
             Register University
           </button>

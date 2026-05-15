@@ -27,7 +27,7 @@ exports.getAdminById = async (req, res) => {
 exports.addAdmin = async (req, res) => {
     try {
         const { name, email, password, confirmPassword, university } = req.body;
-        console.log(name, email, password, confirmPassword, university);
+        // console.log(name, email, password, confirmPassword, university);
 
         if (password !== confirmPassword) {
             return res.status(400).json({ msg: "Passwords do not match" });
@@ -70,17 +70,46 @@ exports.count = async (req, res) => {
         const drivers = await Driver.countDocuments({ university: req.body.university });
         const students = await Student.countDocuments({ university: req.body.university });
 
+        const uni = await University.findById(req.body.university).select("name");
+
         const data = {
             places,
             buses,
             drivers,
-            students
+            students,
+            uni: uni.name,
         }
-        console.log(data);
 
         res.status(200).json(data);
     }
     catch(err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+exports.updateAdminProfile = async (req, res) => {
+    try {
+        const {name, email, phone} = req.body;
+        console.log(req.params.id);
+        
+        const admin = await Admin.findByIdAndUpdate(req.params.id, {
+            name,
+            email,
+            phone,
+        }, {
+            returnDocument: "after",
+        })
+
+        if(!admin) {
+            return res.status(404).json({msg: "Admin not found"});
+        }
+
+        res.json({
+            msg: "Admin updated successfully",
+            admin,
+        });
+    }catch(err) {
+        console.log(err);
         res.status(500).json({ error: err.message });
     }
 }

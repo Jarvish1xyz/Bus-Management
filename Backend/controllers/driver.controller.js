@@ -1,5 +1,6 @@
 const Driver = require('../models/Driver');
 const University = require('../models/University');
+const Bus = require('../models/Bus');
 const bcrypt = require('bcrypt');
 
 
@@ -14,18 +15,36 @@ exports.getAllDriver = async (req, res) => {
 
 exports.getDriverById = async (req, res) => {
     try {
-        const driver = await Driver.findById(req.params.id).populate('university');
-        res.json(driver);
+
+        const driver = await Driver.findById(req.params.id);
+
+        const buses = await Bus.find({
+            driver: req.params.id,
+            university: req.body.university
+        }).populate({
+            path: "routes.points",
+            select: "name"
+        });
+
+        res.status(200).json({
+            driver,
+            buses
+        });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            error: err.message
+        });
+
     }
-}
+};
 
 exports.addDriver = async (req, res) => {
     try {
 
         const { data, university } = req.body;
-        console.log(data);
+        // console.log(data);
         const { name, salary, shift, address, email, phone } = data;
 
         const existingDriver = await Driver.findOne({ email });
@@ -67,6 +86,62 @@ exports.deleteDriver = async (req, res) => {
         }
         res.json({ msg: "Driver deleted successfully" });
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+exports.updateDriver = async (req, res) => {
+    try {
+
+        const updatedDriver = await Driver.findByIdAndUpdate(
+            req.params.id,
+            {
+                name: req.body.name,
+                email: req.body.email,
+                phone: req.body.phone,
+                address: req.body.address,
+                salary: req.body.salary,
+                shift: req.body.shift,
+            },
+            { returnDocument: "after" }
+        );
+
+        res.status(200).json({
+            msg: "Driver updated successfully",
+            driver: updatedDriver
+        });
+
+    } catch (err) {
+        console.log(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+    }
+};
+
+exports.updateDriverProfile = async (req, res) => {
+    try {
+        const {name, email, phone} = req.body;
+        
+        const driver = await Driver.findByIdAndUpdate(req.params.id, {
+            name,
+            email,
+            phone,
+        }, {
+            returnDocument: "after",
+        });
+
+        if(!driver) {
+            return res.status(404).json({msg: "Driver not found"});
+        }
+
+        res.json({
+            msg: "Driver updated successfully",
+            driver,
+        });
+    }catch(err) {
+        console.log(err);
         res.status(500).json({ error: err.message });
     }
 }

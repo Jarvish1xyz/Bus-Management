@@ -15,7 +15,6 @@ const PlaceManagement = () => {
 
   const fetchPlaces = async () => {
     try {
-      console.log(user.university);
       const res = await API.post('/api/place/all', {
         university: user.university,
       });
