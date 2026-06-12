@@ -12,12 +12,6 @@ const BusManagement = () => {
 
     const { triggerNotice } = useNotice();
 
-    useEffect(() => {
-        fetchBuses();
-        fetchDrivers();
-        fetchPlaces();
-    }, []);
-
     const fetchBuses = async () => {
         try {
             const res = await API.post("/api/bus/all", {
@@ -50,6 +44,12 @@ const BusManagement = () => {
             triggerNotice("Failed to fetch places", "error");
         }
     };
+
+    useEffect(() => {
+        fetchBuses();
+        fetchDrivers();
+        fetchPlaces();
+    }, );
 
     const handleAddBus = async (busData) => {
         try {

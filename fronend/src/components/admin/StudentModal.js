@@ -56,7 +56,7 @@ const StudentModal = ({ studentId, onClose, places = [] }) => {
         } finally {
             setLoading(false);
         }
-    }, [studentId]);
+    }, [studentId, triggerNotice]);
 
     useEffect(() => {
         if (studentId) {

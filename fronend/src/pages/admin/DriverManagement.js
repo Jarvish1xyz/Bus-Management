@@ -8,9 +8,7 @@ const DriverManagement = () => {
     const [drivers, setDrivers] = useState([]);
     const { triggerNotice } = useNotice();
 
-    useEffect(() => {
-        fetchDrivers();
-    }, []);
+    
 
     const fetchDrivers = async () => {
         try {
@@ -22,6 +20,10 @@ const DriverManagement = () => {
             triggerNotice("Failed to fetch drivers", "error");
         }
     };
+
+    useEffect(() => {
+        fetchDrivers();
+    }, );
 
     const handleAddDriver = async (data) => {
         try {

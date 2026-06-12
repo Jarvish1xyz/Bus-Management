@@ -73,7 +73,7 @@ const BusModal = ({
         if (busId) {
             fetchBus();
         }
-    }, [busId]);
+    }, [busId, fetchBus]);
 
 
     const handleChange = (key, value) => {

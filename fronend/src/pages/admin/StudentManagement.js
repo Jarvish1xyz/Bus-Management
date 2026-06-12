@@ -11,10 +11,6 @@ const StudentManagement = () => {
 
     const { triggerNotice } = useNotice();
 
-    useEffect(() => {
-        fetchStudents();
-        fetchPlaces();
-    }, []);
 
     const fetchStudents = async () => {
         try {
@@ -37,6 +33,11 @@ const StudentManagement = () => {
             triggerNotice("Failed to fetch places", "error");
         }
     };
+
+    useEffect(() => {
+        fetchStudents();
+        fetchPlaces();
+    },);
 
     const handleAddStudent = async (data) => {
         try {

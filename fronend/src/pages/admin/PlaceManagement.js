@@ -8,10 +8,6 @@ const PlaceManagement = () => {
   const [places, setPlaces] = useState([]);
   const { triggerNotice } = useNotice();
 
-  // 1. Load places from Backend on mount
-  useEffect(() => {
-    fetchPlaces();
-  }, []);
 
   const fetchPlaces = async () => {
     try {
@@ -23,6 +19,10 @@ const PlaceManagement = () => {
       console.error("Failed to fetch places");
     }
   };
+
+  useEffect(() => {
+    fetchPlaces();
+  }, );
 
   // 2. Handle Adding New Places (from the Modal)
   const handleAddPlaces = async (newPlaceNames) => {
