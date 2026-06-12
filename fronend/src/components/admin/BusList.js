@@ -94,7 +94,10 @@ const BusList = ({ buses, drivers, places, onDelete, onAdd }) => {
                 {isModalOpen && (
                     <AddBusModal
                         onClose={() => setIsModalOpen(false)}
-                        onAdd={onAdd}
+                        onAdd={(data) => {
+                            onAdd(data);
+                            setIsModalOpen(false);
+                        }}
                         drivers={drivers}
                         places={places}
                     />

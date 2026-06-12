@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://vigilant-space-carnival-6949vw59xqpphxpq-5000.app.github.dev",
+  baseURL: process.env.REACT_APP_API_BASE_URL,
 });
 
 API.interceptors.request.use((req) => {

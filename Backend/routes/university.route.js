@@ -6,7 +6,7 @@ const universityRouter = express.Router();
 universityRouter.get('/all', getAllUniversity);
 universityRouter.get('/:id', getUniversityById);
 // console.log("Request is in route")
-universityRouter.post('/', authMiddleware, adminMiddleware, addUniversity);
+universityRouter.post('/', addUniversity);
 universityRouter.patch('/:id', authMiddleware, adminMiddleware, updateUniversity)
 
 module.exports = universityRouter;

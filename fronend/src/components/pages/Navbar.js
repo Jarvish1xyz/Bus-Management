@@ -28,26 +28,95 @@ function Navbar({ onLineClick }) {
         {/* Logo Section */}
         <div className="flex items-center gap-3 select-none">
           <div className="flex items-center justify-center transition-transform hover:scale-110 duration-200">
-            <svg
-              viewBox="80 80 80 80"
-              className="w-7 h-7 drop-shadow-[0_2px_4px_rgba(37,99,235,0.2)]"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#2563eb" /> {/* Vivid Blue */}
-                  <stop offset="100%" stopColor="#3b82f6" /> {/* Brighter Sky Blue */}
-                </linearGradient>
-              </defs>
-
+            <svg width="26" height="26" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
-                fill="url(#logoGradient)"
-                d="M149.8 85.7c.9.3.7 1.2-.8 3.3-1.9 2.6-2 4.4-2 27.9 0 19.9-.3 25.1-1.3 25.1-3.3 0-3.7-2.3-3.7-23.2 0-11.4-.3-20.8-.6-20.8-.4 0-5.6 4.7-11.5 10.5-6 5.8-11.5 10.5-12.2 10.5-.6 0-6.1-4.7-12.2-10.5-6-5.8-11.3-10.5-11.7-10.5-.5 0-.8 9.4-.8 20.8 0 20.9-.4 23.2-3.7 23.2-1 0-1.3-4.8-1.4-22.8-.1-12.5-.4-21.7-.6-20.5-.2 1.3-1.1 2.3-1.9 2.3-1 0-1.4-1.4-1.6-5.3-.3-10.2-1.6 14.7-1.7 33.5L82 148l2.8.2c6.6.4 8.7-.3 13-4.4 2.9-3 4.2-5 4.2-7 0-1.8-.5-2.8-1.5-2.8-1.2 0-1.5-1.9-1.5-11.5 0-6.3.4-11.5.9-11.5s1.1.3 1.3.7c.2.5 4 4.3 8.4 8.6l8.2 7.8 8.5-8.1c4.8-4.5 9.1-7.9 9.7-7.5.6.3 1 4.7 1 10.1 0 8.2-.3 9.6-2 11.1-3.1 2.7-2.4 5.1 2.8 9.9 4.3 4 5.1 4.4 10 4.4h5.2v-26.3c0-30.3-.5-36.7-2.9-36.6-1 0-1.2.2-.3.6"
+                d="M40 40L128 92L216 40V190L184 210V95L128 128L72 95V210L40 190V40Z"
+                fill="#2563EB"
               />
-              <path
-                fill="url(#logoGradient)"
-                fillOpacity="0.9"
-                d="M136.5 90c-.5.5-5 4.6-9.8 9.1l-8.9 8.1-2.6-2.3c-1.4-1.3-4.4-4.1-6.6-6.1-3.2-2.9-4.4-3.5-5.8-2.7-2.5 1.3-1.5 2.8 7.5 11.7l7.4 7.3 10.9-11.1c10-10.2 12.5-13.9 9.9-14.6-.5-.2-1.4.1-2 .6m-32.4 36.7c0 3.4.9 4.5 7 10.2l7 6.4 6.5-6.4c5.7-5.7 6.4-6.7 6.4-10.3v-4l-6.3 6.2c-3.4 3.4-6.6 6.2-7 6.2s-3.5-2.7-6.9-6-6.3-6-6.5-6-.3 1.7-.2 3.7"
+              <rect
+                x="78"
+                y="92"
+                width="100"
+                height="82"
+                rx="18"
+                fill="#0F172A"
+              />
+
+              <rect
+                x="90"
+                y="104"
+                width="76"
+                height="42"
+                rx="8"
+                fill="#2563EB"
+              />
+
+              <rect
+                x="94"
+                y="152"
+                width="16"
+                height="8"
+                rx="4"
+                fill="white"
+              />
+              <rect
+                x="146"
+                y="152"
+                width="16"
+                height="8"
+                rx="4"
+                fill="white"
+              />
+
+              <rect
+                x="112"
+                y="154"
+                width="32"
+                height="4"
+                rx="2"
+                fill="white"
+              />
+              <rect
+                x="116"
+                y="164"
+                width="24"
+                height="4"
+                rx="2"
+                fill="white"
+              />
+
+              <rect
+                x="68"
+                y="116"
+                width="8"
+                height="24"
+                rx="4"
+                fill="#0F172A"
+              />
+              <rect
+                x="180"
+                y="116"
+                width="8"
+                height="24"
+                rx="4"
+                fill="#0F172A"
+              />
+
+              <rect
+                x="94"
+                y="174"
+                width="18"
+                height="20"
+                rx="4"
+                fill="#0F172A"
+              />
+              <rect
+                x="144"
+                y="174"
+                width="18"
+                height="20"
+                rx="4"
+                fill="#0F172A"
               />
             </svg>
           </div>

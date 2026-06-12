@@ -38,6 +38,6 @@ app.use('/api/student', studentRouter);
 app.use('/api/place', placeRouter);
 app.use('/api', adminRouter);
 
-app.listen(5000, '0.0.0.0', () => {
-    console.log("Server started @ 5000")
+app.listen(5001, '0.0.0.0', () => {
+    console.log("Server started @ 5001")
 })

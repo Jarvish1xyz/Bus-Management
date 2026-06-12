@@ -56,11 +56,16 @@ exports.addStudent = async (req, res) => {
         }
 
         const place = await Place.findOne({ name: pickupPoint, university: uni._id }).select("_id");
-        const bus = await Bus.findOne({ university: uni._id, "routes.points": place._id }).select("_id");
-        if (!bus) {
-            return res.status(400).json({ msg: "Bus not found" });
+        const buses = await Bus.find({
+            university: uni._id,
+            "routes.points": place._id
+        }).select("_id");
+
+        if (buses.length === 0) {
+            return res.status(400).json({ msg: "No bus available for this pickup point" });
         }
-        // console.log(bus);
+        // console.log(buses);
+        const randomBus = buses[Math.floor(Math.random() * buses.length)];
 
         const password = email.split('@')[0];
 
@@ -160,8 +165,8 @@ exports.updateStudent = async (req, res) => {
 
 exports.updateStudentProfile = async (req, res) => {
     try {
-        const {name, email, phone} = req.body;
-        
+        const { name, email, phone } = req.body;
+
         const student = await Student.findByIdAndUpdate(req.params.id, {
             name,
             email,
@@ -170,15 +175,15 @@ exports.updateStudentProfile = async (req, res) => {
             returnDocument: "after",
         });
 
-        if(!student) {
-            return res.status(404).json({msg: "Student not found"});
+        if (!student) {
+            return res.status(404).json({ msg: "Student not found" });
         }
 
         res.json({
             msg: "Student updated successfully",
             student,
         });
-    }catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).json({ error: err.message });
     }
